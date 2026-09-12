@@ -2,32 +2,21 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-
-from drf_yasg import openapi
-from drf_yasg.views import get_schema_view
-from rest_framework import permissions
-
-
-schema_view = get_schema_view(
-    openapi.Info(
-        title="Auto Shop API",
-        default_version="v1",
-        description="API для автомобильного магазина",
-    ),
-    public=True,
-    permission_classes=(permissions.AllowAny,),
-)
+from django.views.generic import TemplateView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-
-    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-    path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
-
     path('auth/', include('accounts.urls')),
     path('product/', include('product.urls')),
     path('category/', include('category.urls')),
     path('comment/', include('comment.urls')),
     path('card/', include('card.urls')),
     path('order/', include('order.urls')),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+]
+
+if settings.FRONTEND_DIR.exists():
+    urlpatterns += [
+        path('', TemplateView.as_view(template_name='index.html')),
+    ]
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
